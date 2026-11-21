@@ -44,21 +44,20 @@ const seed = async () => {
     );
 
     // Create project if it doesn't exist
-    const existingProject = await client.query(
-      "SELECT id FROM projects WHERE name = $1 LIMIT 1",
-      ["Pulse Demo"]
-    );
+    const existingProject = await client.query("SELECT id FROM projects WHERE name = $1 LIMIT 1", [
+      "Pulse Demo",
+    ]);
 
     if (existingProject.rowCount) {
-      await client.query(
-        "UPDATE projects SET api_key_hash = $1 WHERE id = $2",
-        [apiKeyHash, existingProject.rows[0].id]
-      );
+      await client.query("UPDATE projects SET api_key_hash = $1 WHERE id = $2", [
+        apiKeyHash,
+        existingProject.rows[0].id,
+      ]);
     } else {
-      await client.query(
-        "INSERT INTO projects (name, api_key_hash) VALUES ($1, $2)",
-        ["Pulse Demo", apiKeyHash]
-      );
+      await client.query("INSERT INTO projects (name, api_key_hash) VALUES ($1, $2)", [
+        "Pulse Demo",
+        apiKeyHash,
+      ]);
     }
 
     await client.query("COMMIT");

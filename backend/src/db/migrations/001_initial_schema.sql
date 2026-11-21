@@ -39,17 +39,29 @@ CREATE TABLE events (
     id BIGSERIAL PRIMARY KEY,
     project_id BIGINT NOT NULL REFERENCES projects(id),
     issue_id BIGINT REFERENCES issues(id),
-    event_type VARCHAR(20) NOT NULL
-        CHECK (event_type IN ('request', 'error')),
-    environment VARCHAR(50) NOT NULL,
-    occurred_at TIMESTAMPTZ NOT NULL,
-    duration_ms INTEGER CHECK (duration_ms >= 0),
-    user_id VARCHAR(255),
+
+    type VARCHAR(20) NOT NULL
+        CHECK (type IN ('request', 'error')),
+
+    timestamp TIMESTAMPTZ NOT NULL,
+    environment VARCHAR(20) NOT NULL
+        CHECK (environment IN ('production', 'staging', 'development')),
+
+    route TEXT,
+    method VARCHAR(20),
+    status_code INTEGER,
+    duration_ms NUMERIC,
+
     error_type VARCHAR(255),
     message TEXT,
     stack_trace TEXT,
     first_frame TEXT,
-    metadata JSONB NOT NULL DEFAULT '{}'::jsonb
+
+    url TEXT,
+    user_id VARCHAR(255),
+    browser VARCHAR(255),
+
+    metadata JSONB DEFAULT '{}'
 );
 
 -- Unique users affected by each issue
