@@ -76,19 +76,19 @@ CREATE TABLE issue_affected_users (
 
 -- Events: time-based filtering
 CREATE INDEX idx_events_project_time
-ON events (project_id, occurred_at DESC);
+ON events (project_id, timestamp DESC);
 
 -- Events: environment filtering
 CREATE INDEX idx_events_project_environment_time
-ON events (project_id, environment, occurred_at DESC);
+ON events (project_id, environment, timestamp DESC);
 
 -- Events: event type filtering
 CREATE INDEX idx_events_project_type_time
-ON events (project_id, event_type, occurred_at DESC);
+ON events (project_id, type, timestamp DESC);
 
 -- Events: issue occurrences
 CREATE INDEX idx_events_issue_time
-ON events (issue_id, occurred_at DESC);
+ON events (issue_id, timestamp DESC);
 
 -- Issues: project and status filtering
 CREATE INDEX idx_issues_project_status

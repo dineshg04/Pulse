@@ -1,4 +1,3 @@
-
 import type { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import { loginUser } from "../services/auth.service";
@@ -8,11 +7,7 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-export const loginController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const loginController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validation = loginSchema.safeParse(req.body);
 

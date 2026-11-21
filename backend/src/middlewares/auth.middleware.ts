@@ -1,4 +1,3 @@
-
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
@@ -8,11 +7,7 @@ interface TokenPayload {
   role: "admin" | "viewer";
 }
 
-export const authenticate = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const authenticate = (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -38,11 +33,7 @@ export const authenticate = (
   }
 };
 
-export const requireAdmin = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (res.locals.user?.role !== "admin") {
     res.status(403).json({
       message: "Admin access required",

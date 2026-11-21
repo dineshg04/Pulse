@@ -1,4 +1,3 @@
-
 import pool from "../config/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -22,10 +21,7 @@ export const loginUser = async ({ email, password }: LoginInput) => {
 
   const user = result.rows[0];
 
-  const passwordMatches = await bcrypt.compare(
-    password,
-    user.password_hash
-  );
+  const passwordMatches = await bcrypt.compare(password, user.password_hash);
 
   if (!passwordMatches) {
     return null;

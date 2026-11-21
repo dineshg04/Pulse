@@ -12,35 +12,91 @@ const BATCH_SIZE = 500;
 const environments = ["production", "staging", "development"] as const;
 
 const errorDefinitions = [
-  ["TypeError", "Cannot read properties of undefined (reading 'id')", "at CartItem (cart.js:42:13)"],
-  ["TypeError", "Cannot read properties of null (reading 'name')", "at UserProfile (profile.js:25:8)"],
+  [
+    "TypeError",
+    "Cannot read properties of undefined (reading 'id')",
+    "at CartItem (cart.js:42:13)",
+  ],
+  [
+    "TypeError",
+    "Cannot read properties of null (reading 'name')",
+    "at UserProfile (profile.js:25:8)",
+  ],
   ["ReferenceError", "userData is not defined", "at getUser (user.js:18:5)"],
-  ["TypeError", "Cannot read properties of undefined (reading 'map')", "at ProductList (products.js:32:10)"],
+  [
+    "TypeError",
+    "Cannot read properties of undefined (reading 'map')",
+    "at ProductList (products.js:32:10)",
+  ],
   ["ValidationError", "Email is required", "at validateUser (validation.js:15:3)"],
   ["Error", "Database connection failed", "at connectDatabase (database.js:20:7)"],
-  ["TypeError", "Cannot read properties of null (reading 'length')", "at CartService (cart.js:55:12)"],
+  [
+    "TypeError",
+    "Cannot read properties of null (reading 'length')",
+    "at CartService (cart.js:55:12)",
+  ],
   ["SyntaxError", "Unexpected token in JSON", "at parseResponse (api.js:30:9)"],
-  ["TypeError", "Cannot read properties of undefined (reading 'token')", "at authenticate (auth.js:21:4)"],
+  [
+    "TypeError",
+    "Cannot read properties of undefined (reading 'token')",
+    "at authenticate (auth.js:21:4)",
+  ],
   ["Error", "Payment processing failed", "at processPayment (payment.js:45:6)"],
   ["RangeError", "Maximum call stack size exceeded", "at renderComponent (render.js:12:2)"],
-  ["TypeError", "Cannot read properties of undefined (reading 'email')", "at sendEmail (email.js:27:5)"],
+  [
+    "TypeError",
+    "Cannot read properties of undefined (reading 'email')",
+    "at sendEmail (email.js:27:5)",
+  ],
   ["Error", "Request timeout", "at fetchOrders (orders.js:40:8)"],
-  ["TypeError", "Cannot read properties of null (reading 'price')", "at calculateTotal (cart.js:70:3)"],
+  [
+    "TypeError",
+    "Cannot read properties of null (reading 'price')",
+    "at calculateTotal (cart.js:70:3)",
+  ],
   ["Error", "File upload failed", "at uploadFile (upload.js:33:7)"],
   ["ValidationError", "Invalid phone number", "at validatePhone (validation.js:22:4)"],
-  ["TypeError", "Cannot read properties of undefined (reading 'status')", "at checkStatus (status.js:19:6)"],
+  [
+    "TypeError",
+    "Cannot read properties of undefined (reading 'status')",
+    "at checkStatus (status.js:19:6)",
+  ],
   ["Error", "Redis connection refused", "at connectRedis (redis.js:16:5)"],
-  ["TypeError", "Cannot read properties of null (reading 'id')", "at deleteProduct (product.js:28:3)"],
+  [
+    "TypeError",
+    "Cannot read properties of null (reading 'id')",
+    "at deleteProduct (product.js:28:3)",
+  ],
   ["Error", "Unable to generate invoice", "at generateInvoice (invoice.js:51:9)"],
   ["SyntaxError", "Invalid regular expression", "at validateInput (input.js:14:2)"],
-  ["TypeError", "Cannot read properties of undefined (reading 'address')", "at getAddress (address.js:37:5)"],
+  [
+    "TypeError",
+    "Cannot read properties of undefined (reading 'address')",
+    "at getAddress (address.js:37:5)",
+  ],
   ["Error", "Unauthorized access", "at verifyPermission (auth.js:44:8)"],
-  ["TypeError", "Cannot read properties of null (reading 'quantity')", "at updateStock (stock.js:29:4)"],
+  [
+    "TypeError",
+    "Cannot read properties of null (reading 'quantity')",
+    "at updateStock (stock.js:29:4)",
+  ],
   ["Error", "External API returned 500", "at callExternalApi (external.js:60:7)"],
-  ["ValidationError", "Password must contain at least 8 characters", "at validatePassword (validation.js:38:3)"],
-  ["TypeError", "Cannot read properties of undefined (reading 'role')", "at checkRole (user.js:48:5)"],
+  [
+    "ValidationError",
+    "Password must contain at least 8 characters",
+    "at validatePassword (validation.js:38:3)",
+  ],
+  [
+    "TypeError",
+    "Cannot read properties of undefined (reading 'role')",
+    "at checkRole (user.js:48:5)",
+  ],
   ["Error", "Order creation failed", "at createOrder (order.js:73:6)"],
-  ["TypeError", "Cannot read properties of null (reading 'createdAt')", "at formatDate (date.js:20:4)"],
+  [
+    "TypeError",
+    "Cannot read properties of null (reading 'createdAt')",
+    "at formatDate (date.js:20:4)",
+  ],
   ["Error", "Session expired", "at validateSession (session.js:31:8)"],
 ] as const;
 
@@ -51,21 +107,16 @@ type SeedEvent = {
   issueId: number | null;
 };
 
-const randomItem = <T>(items: readonly T[]): T =>
-  items[Math.floor(Math.random() * items.length)];
+const randomItem = <T>(items: readonly T[]): T => items[Math.floor(Math.random() * items.length)];
 
-const randomUserId = (): string =>
-  `u_${Math.floor(Math.random() * 5000) + 1}`;
+const randomUserId = (): string => `u_${Math.floor(Math.random() * 5000) + 1}`;
 
 const getTimestamp = (): string => {
   const date = new Date();
   date.setUTCDate(date.getUTCDate() - Math.floor(Math.random() * 7));
 
   // Busy hours receive more events than quiet hours.
-  const hourWeights = [
-    1, 1, 1, 1, 1, 2, 3, 5, 8, 10, 10, 9,
-    8, 8, 9, 10, 10, 9, 7, 5, 3, 2, 1, 1,
-  ];
+  const hourWeights = [1, 1, 1, 1, 1, 2, 3, 5, 8, 10, 10, 9, 8, 8, 9, 10, 10, 9, 7, 5, 3, 2, 1, 1];
 
   const totalWeight = hourWeights.reduce((sum, weight) => sum + weight, 0);
   let random = Math.random() * totalWeight;
@@ -89,7 +140,7 @@ const getTimestamp = (): string => {
   );
 
   if (date.getTime() > Date.now()) {
-  date.setTime(Date.now());
+    date.setTime(Date.now());
   }
   return date.toISOString();
 };
@@ -127,20 +178,11 @@ const generateError = (): ErrorEvent => {
     stackTrace: `${errorType}: ${message}\n    ${firstFrame}\n    at processRequest (server.js:80:5)`,
     url: randomItem(["/checkout", "/products", "/cart", "/login", "/profile"]),
     userId: randomUserId(),
-    browser: randomItem([
-      "Chrome 131",
-      "Firefox 132",
-      "Safari 18",
-      "Edge 131",
-    ]),
+    browser: randomItem(["Chrome 131", "Firefox 132", "Safari 18", "Edge 131"]),
   };
 };
 
-const insertEvents = async (
-  client: PoolClient,
-  projectId: number,
-  events: SeedEvent[]
-) => {
+const insertEvents = async (client: PoolClient, projectId: number, events: SeedEvent[]) => {
   for (let start = 0; start < events.length; start += BATCH_SIZE) {
     const batch = events.slice(start, start + BATCH_SIZE);
     const values: unknown[] = [];
@@ -165,15 +207,12 @@ const insertEvents = async (
         isError ? event.message : null,
         isError ? event.stackTrace : null,
         isError ? getFirstStackFrame(event.stackTrace) : null,
-        isError ? event.url ?? null : null,
-        isError ? event.userId ?? null : null,
-        isError ? event.browser ?? null : null
+        isError ? (event.url ?? null) : null,
+        isError ? (event.userId ?? null) : null,
+        isError ? (event.browser ?? null) : null
       );
 
-      return `(${Array.from(
-        { length: 16 },
-        (_, i) => `$${offset + i + 1}`
-      ).join(", ")})`;
+      return `(${Array.from({ length: 16 }, (_, i) => `$${offset + i + 1}`).join(", ")})`;
     });
 
     await client.query(
@@ -196,10 +235,9 @@ const seedEvents = async () => {
   try {
     await client.query("BEGIN");
 
-    const projectResult = await client.query(
-      "SELECT id FROM projects WHERE name = $1 LIMIT 1",
-      ["Pulse Demo"]
-    );
+    const projectResult = await client.query("SELECT id FROM projects WHERE name = $1 LIMIT 1", [
+      "Pulse Demo",
+    ]);
 
     if (!projectResult.rows.length) {
       throw new Error("Pulse Demo project not found. Run npm run seed first.");
@@ -214,10 +252,7 @@ const seedEvents = async () => {
     const events: SeedEvent[] = [];
 
     for (let i = 0; i < TOTAL_EVENTS; i++) {
-      const rawEvent =
-        i < TOTAL_EVENTS - TOTAL_ERRORS
-          ? generateRequest()
-          : generateError();
+      const rawEvent = i < TOTAL_EVENTS - TOTAL_ERRORS ? generateRequest() : generateError();
 
       const validation = eventSchema.safeParse(rawEvent);
 
@@ -236,11 +271,7 @@ const seedEvents = async () => {
     // Group errors and obtain their issue IDs.
     for (const item of events) {
       if (item.event.type === "error") {
-        item.issueId = await groupError(
-          client,
-          projectId,
-          item.event
-        );
+        item.issueId = await groupError(client, projectId, item.event);
       }
     }
 

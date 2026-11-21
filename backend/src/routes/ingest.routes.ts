@@ -1,4 +1,3 @@
-
 import { Router } from "express";
 import { ingestEvents } from "../controllers/ingest.controller";
 import { validateApiKey } from "../middlewares/apiKey.middleware";

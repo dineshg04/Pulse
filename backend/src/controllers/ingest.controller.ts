@@ -1,13 +1,8 @@
-
 import { Request, Response, NextFunction } from "express";
 import { eventSchema } from "../schemas/event.schema";
 import { storeEvent } from "../services/event.service";
 
-export const ingestEvents = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const ingestEvents = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!Array.isArray(req.body)) {
       res.status(400).json({
