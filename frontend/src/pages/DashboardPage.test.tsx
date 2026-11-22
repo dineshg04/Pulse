@@ -1,3 +1,4 @@
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -49,18 +50,29 @@ describe("DashboardPage", () => {
     });
   });
 
-  it("shows custom date range by default", () => {
+  it("shows 7 days as the default time range", () => {
     renderDashboardPage();
 
-    expect(screen.getByLabelText("Time Range")).toHaveValue("custom");
-    expect(screen.getByLabelText("From")).toBeInTheDocument();
-    expect(screen.getByLabelText("To")).toBeInTheDocument();
+    expect(screen.getByLabelText("Time Range")).toHaveValue("7d");
 
-    expect(screen.getByRole("button", { name: "Apply" })).toBeInTheDocument();
+    expect(screen.queryByLabelText("From")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("To")).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("button", { name: "Apply" }),
+    ).not.toBeInTheDocument();
   });
 
   it("hides custom date inputs when another range is selected", () => {
     renderDashboardPage();
+
+    fireEvent.change(screen.getByLabelText("Time Range"), {
+      target: { value: "custom" },
+    });
+
+    expect(screen.getByLabelText("Time Range")).toHaveValue("custom");
+    expect(screen.getByLabelText("From")).toBeInTheDocument();
+    expect(screen.getByLabelText("To")).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("Time Range"), {
       target: { value: "24h" },
