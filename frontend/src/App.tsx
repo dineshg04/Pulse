@@ -1,17 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import LoginPage from "./pages/LoginPage";
 import AppLayout from "./components/layouts/AppLayout";
-
-import { Typography } from "@mui/material";
-
-function DashboardPlaceholder() {
-  return (
-    <Typography variant="h4" sx={{ fontWeight: 700 }}>
-      Welcome to Pulse Dashboard
-    </Typography>
-  );
-}
+import ProtectedRoute from "./components/auth/ProtectedRoutes";
+import DashboardPage from "./pages/DashboardPage";
+import IssuesPage from "./pages/IssuesPage";
+import IssueDetailPage from "./pages/IssueDetailPage";
 
 function App() {
   return (
@@ -22,9 +15,31 @@ function App() {
         <Route
           path="/"
           element={
-            <AppLayout>
-              <DashboardPlaceholder />
-            </AppLayout>
+            <ProtectedRoute>
+              <AppLayout>
+                <DashboardPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/issues"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <IssuesPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/issues/:id"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <IssueDetailPage />
+              </AppLayout>
+            </ProtectedRoute>
           }
         />
       </Routes>
