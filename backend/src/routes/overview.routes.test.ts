@@ -5,12 +5,10 @@ import app from "../app";
 describe("GET /api/overview", () => {
   it("should return overview metrics for the selected time range", async () => {
     // Step 1: Login as admin
-    const loginResponse = await request(app)
-      .post("/api/auth/login")
-      .send({
-        email: "admin@pulse.com",
-        password: "admin@123",
-      });
+    const loginResponse = await request(app).post("/api/auth/login").send({
+      email: "admin@pulse.com",
+      password: "admin@123",
+    });
 
     expect(loginResponse.status).toBe(200);
 
@@ -35,15 +33,13 @@ describe("GET /api/overview", () => {
     expect(response.body).toHaveProperty("affectedUsers");
   });
 
-    // Test 2: Missing JWT token
+  // Test 2: Missing JWT token
   it("should reject requests without a JWT token", async () => {
-    const response = await request(app)
-      .get("/api/overview")
-      .query({
-        from: "2026-11-20T00:00:00.000Z",
-        to: "2026-11-21T23:59:59.999Z",
-        environment: "all",
-      });
+    const response = await request(app).get("/api/overview").query({
+      from: "2026-11-20T00:00:00.000Z",
+      to: "2026-11-21T23:59:59.999Z",
+      environment: "all",
+    });
 
     expect(response.status).toBe(401);
   });

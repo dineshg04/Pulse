@@ -1,4 +1,3 @@
-
 import pool from "../config/db";
 
 interface IssueFilters {
@@ -14,17 +13,7 @@ interface IssueFilters {
 }
 
 export const getIssues = async (filters: IssueFilters) => {
-  const {
-    from,
-    to,
-    environment,
-    page,
-    limit,
-    sortBy,
-    order,
-    search,
-    status,
-  } = filters;
+  const { from, to, environment, page, limit, sortBy, order, search, status } = filters;
 
   const sortColumns = {
     count: "fe.event_count",
@@ -35,13 +24,7 @@ export const getIssues = async (filters: IssueFilters) => {
   const sortColumn = sortColumns[sortBy];
   const offset = (page - 1) * limit;
 
-  const values = [
-    from,
-    to,
-    environment,
-    search ? `%${search}%` : null,
-    status ?? null,
-  ];
+  const values = [from, to, environment, search ? `%${search}%` : null, status ?? null];
 
   const countResult = await pool.query(
     `SELECT COUNT(*) AS total

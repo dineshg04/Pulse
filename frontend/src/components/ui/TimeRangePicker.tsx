@@ -1,4 +1,3 @@
-
 import type { TimeRange } from "../../types/dashboard";
 
 interface TimeRangePickerProps {
@@ -30,9 +29,7 @@ function TimeRangePicker({
       <select
         aria-label="Time Range"
         value={timeRange}
-        onChange={(event) =>
-          setTimeRange(event.target.value as TimeRange)
-        }
+        onChange={(event) => setTimeRange(event.target.value as TimeRange)}
         className={`${inputClass} min-w-[150px]`}
       >
         <option value="1h">Last 1 hour</option>

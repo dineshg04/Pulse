@@ -1,13 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 
-import {
-  ArrowLeft,
-  Bug,
-  Users,
-  Clock,
-  CalendarDays,
-} from "lucide-react";
+import { ArrowLeft, Bug, Users, Clock, CalendarDays } from "lucide-react";
 
 import {
   CartesianGrid,
@@ -20,10 +14,7 @@ import {
 } from "recharts";
 
 import { useAuth } from "../context/AuthContext";
-import {
-  useIssueDetail,
-  useUpdateIssueStatus,
-} from "../hooks/useIssueDetail";
+import { useIssueDetail, useUpdateIssueStatus } from "../hooks/useIssueDetail";
 import DataTable from "../components/ui/DataTable";
 import KpiCard from "../components/ui/Kpicard";
 import TimeRangePicker from "../components/ui/TimeRangePicker";
@@ -71,9 +62,7 @@ function getCustomDateRange(fromDate: string, toDate: string) {
   };
 }
 
-function getStatusColor(
-  status: IssueStatus,
-): "success" | "error" | "default" {
+function getStatusColor(status: IssueStatus): "success" | "error" | "default" {
   if (status === "resolved") return "success";
   if (status === "open") return "error";
   return "default";
@@ -126,8 +115,7 @@ function IssueDetailPage() {
   });
 
   const isCustomRangeInvalid =
-    range === "custom" &&
-    (!customFrom || !customTo || customFrom > customTo);
+    range === "custom" && (!customFrom || !customTo || customFrom > customTo);
 
   // Update selected time range in URL
   const handleTimeRangeChange = (newRange: TimeRange) => {
@@ -201,8 +189,7 @@ function IssueDetailPage() {
     statusMutation.mutate(status);
   };
 
-  const formatDate = (value: string) =>
-    new Date(value).toLocaleString();
+  const formatDate = (value: string) => new Date(value).toLocaleString();
 
   const formatChartDate = (value: string) =>
     new Date(value).toLocaleDateString();
@@ -317,9 +304,7 @@ function IssueDetailPage() {
                   value={issue.status}
                   disabled={statusMutation.isPending}
                   onChange={(event) =>
-                    handleStatusChange(
-                      event.target.value as IssueStatus,
-                    )
+                    handleStatusChange(event.target.value as IssueStatus)
                   }
                   className={`${inputClass} min-w-[160px] disabled:cursor-not-allowed disabled:opacity-50`}
                 >
@@ -344,9 +329,7 @@ function IssueDetailPage() {
         <div className="p-4 sm:p-5">
           <div className="flex flex-col flex-wrap gap-4 sm:flex-row sm:items-center">
             <div>
-              <p className="text-sm font-bold text-foreground">
-                Issue filters
-              </p>
+              <p className="text-sm font-bold text-foreground">Issue filters</p>
 
               <p className="text-xs text-muted-foreground">
                 Select a period to view issue activity
@@ -385,9 +368,7 @@ function IssueDetailPage() {
           role="alert"
           className="mb-6 flex flex-wrap items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 p-3 text-sm text-danger"
         >
-          <span>
-            Unable to update issue status. Please try again.
-          </span>
+          <span>Unable to update issue status. Please try again.</span>
 
           <button
             onClick={() => statusMutation.mutate(issue.status)}
@@ -519,9 +500,7 @@ function IssueDetailPage() {
                   />
 
                   <Tooltip
-                    labelFormatter={(value) =>
-                      formatDate(String(value))
-                    }
+                    labelFormatter={(value) => formatDate(String(value))}
                     contentStyle={{
                       backgroundColor: "var(--color-card)",
                       border: "1px solid var(--color-border)",
@@ -567,47 +546,47 @@ function IssueDetailPage() {
             </div>
           ) : (
             <DataTable minWidth="850px">
-                <thead>
-                  <tr className="border-b border-border text-xs font-semibold text-muted-foreground">
-                    <th className="px-3 py-3">Timestamp</th>
-                    <th className="px-3 py-3">Environment</th>
-                    <th className="px-3 py-3">URL</th>
-                    <th className="px-3 py-3">User ID</th>
-                    <th className="px-3 py-3">Browser</th>
+              <thead>
+                <tr className="border-b border-border text-xs font-semibold text-muted-foreground">
+                  <th className="px-3 py-3">Timestamp</th>
+                  <th className="px-3 py-3">Environment</th>
+                  <th className="px-3 py-3">URL</th>
+                  <th className="px-3 py-3">User ID</th>
+                  <th className="px-3 py-3">Browser</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {occurrences.map((occurrence) => (
+                  <tr
+                    key={occurrence.id}
+                    className="border-b border-border transition-colors last:border-0 hover:bg-muted/50"
+                  >
+                    <td className="min-w-[170px] px-3 py-4 text-foreground">
+                      {formatDate(occurrence.timestamp)}
+                    </td>
+
+                    <td className="px-3 py-4">
+                      <span className="inline-flex rounded-full border border-border px-2.5 py-1 text-xs font-semibold capitalize text-muted-foreground">
+                        {occurrence.environment}
+                      </span>
+                    </td>
+
+                    <td className="min-w-[180px] max-w-[280px] break-words px-3 py-4 text-foreground">
+                      {occurrence.url || "N/A"}
+                    </td>
+
+                    <td className="px-3 py-4 text-foreground">
+                      {occurrence.userId ?? "N/A"}
+                    </td>
+
+                    <td className="min-w-[140px] px-3 py-4 text-foreground">
+                      {occurrence.browser ?? "N/A"}
+                    </td>
                   </tr>
-                </thead>
-
-                <tbody>
-                  {occurrences.map((occurrence) => (
-                    <tr
-                      key={occurrence.id}
-                      className="border-b border-border transition-colors last:border-0 hover:bg-muted/50"
-                    >
-                      <td className="min-w-[170px] px-3 py-4 text-foreground">
-                        {formatDate(occurrence.timestamp)}
-                      </td>
-
-                      <td className="px-3 py-4">
-                        <span className="inline-flex rounded-full border border-border px-2.5 py-1 text-xs font-semibold capitalize text-muted-foreground">
-                          {occurrence.environment}
-                        </span>
-                      </td>
-
-                      <td className="min-w-[180px] max-w-[280px] break-words px-3 py-4 text-foreground">
-                        {occurrence.url || "N/A"}
-                      </td>
-
-                      <td className="px-3 py-4 text-foreground">
-                        {occurrence.userId ?? "N/A"}
-                      </td>
-
-                      <td className="min-w-[140px] px-3 py-4 text-foreground">
-                        {occurrence.browser ?? "N/A"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </DataTable>
+                ))}
+              </tbody>
+            </DataTable>
           )}
         </div>
       </div>

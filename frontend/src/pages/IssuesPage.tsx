@@ -455,116 +455,116 @@ function IssuesPage() {
             <>
               {/* Table */}
               <DataTable minWidth="850px">
-                  <thead>
-                    <tr className="border-b border-border text-xs font-semibold text-muted-foreground">
-                      <th className="px-3 py-3">Issue</th>
+                <thead>
+                  <tr className="border-b border-border text-xs font-semibold text-muted-foreground">
+                    <th className="px-3 py-3">Issue</th>
 
-                      <th className="px-3 py-3">Status</th>
-                      <th className="px-3 py-3">Environment</th>
-                      <th className="px-3 py-3 text-right">
-                        <button
-                          onClick={() => handleSort("count")}
-                          className="whitespace-nowrap font-semibold transition-colors hover:text-foreground"
-                        >
-                          Occurrences
-                          {sortBy === "count"
-                            ? order === "asc"
-                              ? " ↑"
-                              : " ↓"
-                            : ""}
-                        </button>
-                      </th>
-
-                      <th className="px-3 py-3 text-right">Affected Users</th>
-
-                      <th className="px-3 py-3">
-                        <button
-                          onClick={() => handleSort("firstSeen")}
-                          className="whitespace-nowrap font-semibold transition-colors hover:text-foreground"
-                        >
-                          First Seen
-                          {sortBy === "firstSeen"
-                            ? order === "asc"
-                              ? " ↑"
-                              : " ↓"
-                            : ""}
-                        </button>
-                      </th>
-
-                      <th className="px-3 py-3">
-                        <button
-                          onClick={() => handleSort("lastSeen")}
-                          className="whitespace-nowrap font-semibold transition-colors hover:text-foreground"
-                        >
-                          Last Seen
-                          {sortBy === "lastSeen"
-                            ? order === "asc"
-                              ? " ↑"
-                              : " ↓"
-                            : ""}
-                        </button>
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {issues.map((issue) => (
-                      <tr
-                        key={issue.id}
-                        className="border-b border-border transition-colors last:border-0 hover:bg-muted/50"
+                    <th className="px-3 py-3">Status</th>
+                    <th className="px-3 py-3">Environment</th>
+                    <th className="px-3 py-3 text-right">
+                      <button
+                        onClick={() => handleSort("count")}
+                        className="whitespace-nowrap font-semibold transition-colors hover:text-foreground"
                       >
-                        <td className="min-w-[220px] px-3 py-4">
-                          <Link
-                            to={`/issues/${issue.id}?${searchParams.toString()}`}
-                            className="break-words font-semibold text-foreground transition-colors hover:text-primary hover:underline"
-                          >
-                            {issue.message}
-                          </Link>
+                        Occurrences
+                        {sortBy === "count"
+                          ? order === "asc"
+                            ? " ↑"
+                            : " ↓"
+                          : ""}
+                      </button>
+                    </th>
 
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            {issue.errorType}
-                          </p>
-                        </td>
+                    <th className="px-3 py-3 text-right">Affected Users</th>
 
-                        <td className="px-3 py-4">
-                          <span
-                            className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold capitalize ${getStatusStyles(issue.status)}`}
-                          >
-                            {issue.status}
-                          </span>
-                        </td>
-                        <td className="px-3 py-4">
-                          <div className="flex flex-wrap gap-1">
-                            {issue.environments.map((environment) => (
-                              <span
-                                key={environment}
-                                className={`rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground ${getEnvironmentStyles(environment)}`}
-                              >
-                                {environment.toUpperCase()}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
+                    <th className="px-3 py-3">
+                      <button
+                        onClick={() => handleSort("firstSeen")}
+                        className="whitespace-nowrap font-semibold transition-colors hover:text-foreground"
+                      >
+                        First Seen
+                        {sortBy === "firstSeen"
+                          ? order === "asc"
+                            ? " ↑"
+                            : " ↓"
+                          : ""}
+                      </button>
+                    </th>
 
-                        <td className="px-3 py-4 text-right font-bold text-foreground">
-                          {issue.totalCount.toLocaleString()}
-                        </td>
+                    <th className="px-3 py-3">
+                      <button
+                        onClick={() => handleSort("lastSeen")}
+                        className="whitespace-nowrap font-semibold transition-colors hover:text-foreground"
+                      >
+                        Last Seen
+                        {sortBy === "lastSeen"
+                          ? order === "asc"
+                            ? " ↑"
+                            : " ↓"
+                          : ""}
+                      </button>
+                    </th>
+                  </tr>
+                </thead>
 
-                        <td className="px-3 py-4 text-right text-foreground">
-                          {issue.affectedUsers.toLocaleString()}
-                        </td>
+                <tbody>
+                  {issues.map((issue) => (
+                    <tr
+                      key={issue.id}
+                      className="border-b border-border transition-colors last:border-0 hover:bg-muted/50"
+                    >
+                      <td className="min-w-[220px] px-3 py-4">
+                        <Link
+                          to={`/issues/${issue.id}?${searchParams.toString()}`}
+                          className="break-words font-semibold text-foreground transition-colors hover:text-primary hover:underline"
+                        >
+                          {issue.message}
+                        </Link>
 
-                        <td className="min-w-[150px] px-3 py-4 text-foreground">
-                          {formatDate(issue.firstSeen)}
-                        </td>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {issue.errorType}
+                        </p>
+                      </td>
 
-                        <td className="min-w-[150px] px-3 py-4 text-foreground">
-                          {formatDate(issue.lastSeen)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </DataTable>
+                      <td className="px-3 py-4">
+                        <span
+                          className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold capitalize ${getStatusStyles(issue.status)}`}
+                        >
+                          {issue.status}
+                        </span>
+                      </td>
+                      <td className="px-3 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {issue.environments.map((environment) => (
+                            <span
+                              key={environment}
+                              className={`rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground ${getEnvironmentStyles(environment)}`}
+                            >
+                              {environment.toUpperCase()}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+
+                      <td className="px-3 py-4 text-right font-bold text-foreground">
+                        {issue.totalCount.toLocaleString()}
+                      </td>
+
+                      <td className="px-3 py-4 text-right text-foreground">
+                        {issue.affectedUsers.toLocaleString()}
+                      </td>
+
+                      <td className="min-w-[150px] px-3 py-4 text-foreground">
+                        {formatDate(issue.firstSeen)}
+                      </td>
+
+                      <td className="min-w-[150px] px-3 py-4 text-foreground">
+                        {formatDate(issue.lastSeen)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </DataTable>
 
               {/* Pagination */}
               <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
