@@ -2,15 +2,9 @@ import {
   createContext,
   useContext,
   useEffect,
-  useMemo,
   useState,
   type ReactNode,
 } from "react";
-
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-
-import getTheme from "../theme";
 
 type ThemeMode = "light" | "dark";
 
@@ -37,17 +31,14 @@ export function AppThemeProvider({ children }: ThemeProviderProps) {
   };
 
   useEffect(() => {
+    document.documentElement.classList.toggle("dark", mode === "dark");
+
     localStorage.setItem("pulse-theme", mode);
   }, [mode]);
 
-  const theme = useMemo(() => getTheme(mode), [mode]);
-
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
+      {children}
     </ThemeContext.Provider>
   );
 }

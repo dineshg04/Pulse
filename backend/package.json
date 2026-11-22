@@ -13,8 +13,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test": "dotenv -e .env.test -- vitest run",
+    "test:watch": "dotenv -e .env.test -- vitest"
   },
   "keywords": [],
   "author": "",
@@ -37,7 +37,6 @@
     "@types/node": "^26.6.6",
     "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.1",
-    "dotenv-cli": "^11.1.0",
     "eslint": "^10.15.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.14.0",

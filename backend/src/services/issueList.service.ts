@@ -1,3 +1,4 @@
+
 import pool from "../config/db";
 
 interface IssueFilters {
@@ -13,24 +14,34 @@ interface IssueFilters {
 }
 
 export const getIssues = async (filters: IssueFilters) => {
-  const { from, to, environment, page, limit, sortBy, order, search, status } = filters;
+  const {
+    from,
+    to,
+    environment,
+    page,
+    limit,
+    sortBy,
+    order,
+    search,
+    status,
+  } = filters;
 
   const sortColumns = {
-    count: "event_count",
-    lastSeen: "last_seen",
-    firstSeen: "first_seen",
+    count: "fe.event_count",
+    lastSeen: "fe.last_seen",
+    firstSeen: "fe.first_seen",
   };
 
   const sortColumn = sortColumns[sortBy];
   const offset = (page - 1) * limit;
 
-  const values = [from, to, environment, search ? `%${search}%` : null, status ?? null];
-
-  const conditions = `
-    ($3 = 'all' OR e.environment = $3)
-    AND ($4::text IS NULL OR i.message ILIKE $4)
-    AND ($5::text IS NULL OR i.status = $5)
-  `;
+  const values = [
+    from,
+    to,
+    environment,
+    search ? `%${search}%` : null,
+    status ?? null,
+  ];
 
   const countResult = await pool.query(
     `SELECT COUNT(*) AS total
@@ -41,7 +52,9 @@ export const getIssues = async (filters: IssueFilters) => {
        WHERE e.issue_id = i.id
          AND e.timestamp >= $1
          AND e.timestamp <= $2
-         AND ${conditions}
+         AND ($3 = 'all' OR e.environment = $3)
+         AND ($4::text IS NULL OR i.message ILIKE $4)
+         AND ($5::text IS NULL OR i.status = $5)
      )`,
     values
   );
@@ -53,7 +66,8 @@ export const getIssues = async (filters: IssueFilters) => {
         COUNT(*) AS event_count,
         MIN(e.timestamp) AS first_seen,
         MAX(e.timestamp) AS last_seen,
-        COUNT(DISTINCT e.user_id) AS affected_users
+        COUNT(DISTINCT e.user_id) AS affected_users,
+        ARRAY_AGG(DISTINCT e.environment) AS environments
       FROM events e
       WHERE e.timestamp >= $1
         AND e.timestamp <= $2
@@ -69,6 +83,7 @@ export const getIssues = async (filters: IssueFilters) => {
       fe.last_seen AS "lastSeen",
       fe.event_count AS "totalCount",
       fe.affected_users AS "affectedUsers",
+       fe.environments AS "environments",
       i.status
     FROM issues i
     INNER JOIN filtered_events fe ON fe.issue_id = i.id
@@ -76,7 +91,7 @@ export const getIssues = async (filters: IssueFilters) => {
       AND ($5::text IS NULL OR i.status = $5)
     ORDER BY ${sortColumn} ${order.toUpperCase()}, i.id DESC
     LIMIT $6 OFFSET $7`,
-    [...values.slice(0, 3), values[3], values[4], limit, offset]
+    [...values, limit, offset]
   );
 
   return {
