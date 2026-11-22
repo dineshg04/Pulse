@@ -1,7 +1,13 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 
-import { ArrowLeft, Bug, Users, Clock, CalendarDays } from "lucide-react";
+import {
+  ArrowLeft,
+  Bug,
+  Users,
+  Clock,
+  CalendarDays,
+} from "lucide-react";
 
 import {
   CartesianGrid,
@@ -14,7 +20,13 @@ import {
 } from "recharts";
 
 import { useAuth } from "../context/AuthContext";
-import { useIssueDetail, useUpdateIssueStatus } from "../hooks/useIssueDetail";
+import {
+  useIssueDetail,
+  useUpdateIssueStatus,
+} from "../hooks/useIssueDetail";
+import DataTable from "../components/ui/DataTable";
+import KpiCard from "../components/ui/Kpicard";
+import TimeRangePicker from "../components/ui/TimeRangePicker";
 
 import type {
   DashboardFilters,
@@ -22,6 +34,14 @@ import type {
   IssueStatus,
   TimeRange,
 } from "../types/dashboard";
+
+function getDateInputValue(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 
 function getDateRange(range: Exclude<TimeRange, "custom">) {
   const to = new Date();
@@ -41,59 +61,108 @@ function getDateRange(range: Exclude<TimeRange, "custom">) {
   };
 }
 
-function getStatusColor(status: IssueStatus): "success" | "error" | "default" {
+function getCustomDateRange(fromDate: string, toDate: string) {
+  const from = new Date(`${fromDate}T00:00:00`);
+  const to = new Date(`${toDate}T23:59:59.999`);
+
+  return {
+    from: from.toISOString(),
+    to: to.toISOString(),
+  };
+}
+
+function getStatusColor(
+  status: IssueStatus,
+): "success" | "error" | "default" {
   if (status === "resolved") return "success";
   if (status === "open") return "error";
   return "default";
 }
 
-interface SummaryCardProps {
-  title: string;
-  value: string;
-  icon: React.ReactNode;
-  color: string;
-}
-
-function SummaryCard({ title, value, icon, color }: SummaryCardProps) {
-  return (
-    <div className="h-full rounded-xl border border-border bg-card transition-all duration-200 hover:-translate-y-[3px] hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)] dark:hover:shadow-[0_10px_24px_rgba(0,0,0,0.3)]">
-      <div className="p-5">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-muted-foreground">{title}</p>
-
-          <div
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-lg"
-            style={{
-              backgroundColor: `${color}18`,
-              color,
-            }}
-          >
-            {icon}
-          </div>
-        </div>
-
-        <p className="mt-4 break-words text-xl font-extrabold tracking-[-0.5px] text-foreground">
-          {value}
-        </p>
-      </div>
-    </div>
-  );
-}
-
 function IssueDetailPage() {
   const { id } = useParams();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
 
   const issueId = Number(id);
   const validId = Number.isInteger(issueId) && issueId > 0;
   const isAdmin = user?.role === "admin";
 
-  const range = (searchParams.get("range") as TimeRange | null) ?? "7d";
+  // Read time range from URL
+  const rangeParam = searchParams.get("range");
 
+  const range: TimeRange =
+    rangeParam === "1h" ||
+    rangeParam === "24h" ||
+    rangeParam === "7d" ||
+    rangeParam === "custom"
+      ? rangeParam
+      : "7d";
+
+  // Read environment from URL
   const environment =
     (searchParams.get("environment") as Environment | null) ?? "all";
 
+  // Custom date defaults
+  const today = getDateInputValue(new Date());
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const [customFrom, setCustomFrom] = useState(() => {
+    const from = searchParams.get("from");
+
+    return from && !Number.isNaN(Date.parse(from))
+      ? getDateInputValue(new Date(from))
+      : getDateInputValue(yesterday);
+  });
+
+  const [customTo, setCustomTo] = useState(() => {
+    const to = searchParams.get("to");
+
+    return to && !Number.isNaN(Date.parse(to))
+      ? getDateInputValue(new Date(to))
+      : today;
+  });
+
+  const isCustomRangeInvalid =
+    range === "custom" &&
+    (!customFrom || !customTo || customFrom > customTo);
+
+  // Update selected time range in URL
+  const handleTimeRangeChange = (newRange: TimeRange) => {
+    setSearchParams((previous) => {
+      const params = new URLSearchParams(previous);
+
+      params.set("range", newRange);
+
+      if (newRange !== "custom") {
+        params.delete("from");
+        params.delete("to");
+      }
+
+      return params;
+    });
+  };
+
+  // Apply custom date range
+  const handleApplyCustomRange = () => {
+    if (isCustomRangeInvalid) return;
+
+    const customRange = getCustomDateRange(customFrom, customTo);
+
+    setSearchParams((previous) => {
+      const params = new URLSearchParams(previous);
+
+      params.set("range", "custom");
+      params.set("from", customRange.from);
+      params.set("to", customRange.to);
+
+      return params;
+    });
+  };
+
+  // Calculate date range for API
   const dateRange = useMemo(() => {
     if (range === "custom") {
       const from = searchParams.get("from");
@@ -132,7 +201,8 @@ function IssueDetailPage() {
     statusMutation.mutate(status);
   };
 
-  const formatDate = (value: string) => new Date(value).toLocaleString();
+  const formatDate = (value: string) =>
+    new Date(value).toLocaleString();
 
   const formatChartDate = (value: string) =>
     new Date(value).toLocaleDateString();
@@ -154,6 +224,7 @@ function IssueDetailPage() {
   const inputClass =
     "h-10 rounded-lg border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20";
 
+  // Invalid issue ID
   if (!validId) {
     return (
       <div
@@ -165,6 +236,7 @@ function IssueDetailPage() {
     );
   }
 
+  // Loading state
   if (issueQuery.isLoading) {
     return (
       <div className="space-y-4">
@@ -176,6 +248,7 @@ function IssueDetailPage() {
     );
   }
 
+  // Error state
   if (issueQuery.isError || !issue) {
     return (
       <div
@@ -244,7 +317,9 @@ function IssueDetailPage() {
                   value={issue.status}
                   disabled={statusMutation.isPending}
                   onChange={(event) =>
-                    handleStatusChange(event.target.value as IssueStatus)
+                    handleStatusChange(
+                      event.target.value as IssueStatus,
+                    )
                   }
                   className={`${inputClass} min-w-[160px] disabled:cursor-not-allowed disabled:opacity-50`}
                 >
@@ -264,12 +339,55 @@ function IssueDetailPage() {
         </div>
       </div>
 
+      {/* Time range filter */}
+      <div className="mb-6 rounded-xl border border-border bg-card">
+        <div className="p-4 sm:p-5">
+          <div className="flex flex-col flex-wrap gap-4 sm:flex-row sm:items-center">
+            <div>
+              <p className="text-sm font-bold text-foreground">
+                Issue filters
+              </p>
+
+              <p className="text-xs text-muted-foreground">
+                Select a period to view issue activity
+              </p>
+            </div>
+
+            <div className="flex-1" />
+
+            <TimeRangePicker
+              timeRange={range}
+              setTimeRange={handleTimeRangeChange}
+              customFrom={customFrom}
+              customTo={customTo}
+              setCustomFrom={setCustomFrom}
+              setCustomTo={setCustomTo}
+              onApply={handleApplyCustomRange}
+              isCustomRangeInvalid={isCustomRangeInvalid}
+            />
+          </div>
+
+          {isCustomRangeInvalid && (
+            <div
+              role="alert"
+              className="mt-4 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning"
+            >
+              Please select valid dates. The start date must not be after the
+              end date.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Status update messages */}
       {statusMutation.isError && (
         <div
           role="alert"
           className="mb-6 flex flex-wrap items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 p-3 text-sm text-danger"
         >
-          <span>Unable to update issue status. Please try again.</span>
+          <span>
+            Unable to update issue status. Please try again.
+          </span>
 
           <button
             onClick={() => statusMutation.mutate(issue.status)}
@@ -289,32 +407,36 @@ function IssueDetailPage() {
         </div>
       )}
 
-      {/* Issue summary */}
+      {/* Issue summary using reusable KpiCard */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard
+        <KpiCard
           title="Total Occurrences"
           value={issue.totalCount.toLocaleString()}
+          loading={false}
           icon={<Bug size={20} />}
           color="#EF4444"
         />
 
-        <SummaryCard
+        <KpiCard
           title="Affected Users"
           value={issue.affectedUsers.toLocaleString()}
+          loading={false}
           icon={<Users size={20} />}
           color="#3B82F6"
         />
 
-        <SummaryCard
+        <KpiCard
           title="First Seen"
           value={formatDate(issue.firstSeen)}
+          loading={false}
           icon={<CalendarDays size={20} />}
           color="#635BFF"
         />
 
-        <SummaryCard
+        <KpiCard
           title="Last Seen"
           value={formatDate(issue.lastSeen)}
+          loading={false}
           icon={<Clock size={20} />}
           color="#0D9488"
         />
@@ -397,7 +519,9 @@ function IssueDetailPage() {
                   />
 
                   <Tooltip
-                    labelFormatter={(value) => formatDate(String(value))}
+                    labelFormatter={(value) =>
+                      formatDate(String(value))
+                    }
                     contentStyle={{
                       backgroundColor: "var(--color-card)",
                       border: "1px solid var(--color-border)",
@@ -442,8 +566,7 @@ function IssueDetailPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[750px] border-collapse text-left text-sm">
+            <DataTable minWidth="850px">
                 <thead>
                   <tr className="border-b border-border text-xs font-semibold text-muted-foreground">
                     <th className="px-3 py-3">Timestamp</th>
@@ -484,8 +607,7 @@ function IssueDetailPage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
-            </div>
+              </DataTable>
           )}
         </div>
       </div>

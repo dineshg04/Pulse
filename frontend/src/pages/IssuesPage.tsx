@@ -7,6 +7,7 @@ import { useIssues } from "../hooks/useIssues";
 import type { Environment, IssueStatus, TimeRange } from "../types/dashboard";
 
 import type { IssuesFilters } from "../api/issues.api";
+import DataTable from "../components/ui/DataTable";
 
 const DEFAULT_RANGE: TimeRange = "24h";
 const DEFAULT_ENVIRONMENT: Environment = "all";
@@ -453,8 +454,7 @@ function IssuesPage() {
           ) : (
             <>
               {/* Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[850px] border-collapse text-left text-sm">
+              <DataTable minWidth="850px">
                   <thead>
                     <tr className="border-b border-border text-xs font-semibold text-muted-foreground">
                       <th className="px-3 py-3">Issue</th>
@@ -564,8 +564,7 @@ function IssuesPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
-              </div>
+                </DataTable>
 
               {/* Pagination */}
               <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">

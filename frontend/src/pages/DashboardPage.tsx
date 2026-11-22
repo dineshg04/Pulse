@@ -1,3 +1,4 @@
+
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -25,6 +26,9 @@ import {
   useTopIssues,
 } from "../hooks/useDashboard";
 
+import KpiCard from "../components/ui/Kpicard";
+import DataTable from "../components/ui/DataTable";
+import TimeRangePicker from "../components/ui/TimeRangePicker";
 import type { Environment, TimeRange } from "../types/dashboard";
 
 function getDateInputValue(date: Date): string {
@@ -63,63 +67,8 @@ function getCustomDateRange(fromDate: string, toDate: string) {
   };
 }
 
-interface KpiCardProps {
-  title: string;
-  value: string;
-  description?: string;
-  loading: boolean;
-  icon: React.ReactNode;
-  color: string;
-}
-
-function KpiCard({
-  title,
-  value,
-  description,
-  loading,
-  icon,
-  color,
-}: KpiCardProps) {
-  return (
-    <div
-      className="h-full rounded-xl border border-border border-t-[3px] bg-card text-card-foreground transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(15,23,42,0.09)] dark:hover:shadow-[0_12px_28px_rgba(0,0,0,0.3)]"
-      style={{ borderTopColor: color }}
-    >
-      <div className="p-5">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-muted-foreground">{title}</p>
-
-          <div
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-lg"
-            style={{
-              backgroundColor: `${color}18`,
-              color,
-            }}
-          >
-            {icon}
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="mt-3 h-[45px] w-[65%] animate-pulse rounded-md bg-muted" />
-        ) : (
-          <p className="mt-3 break-words text-3xl font-extrabold tracking-[-1px] text-foreground">
-            {value}
-          </p>
-        )}
-
-        {description && (
-          <p className="mt-2 block text-xs text-muted-foreground">
-            {description}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
-
 function DashboardPage() {
-  const [timeRange, setTimeRange] = useState<TimeRange>("custom");
+  const [timeRange, setTimeRange] = useState<TimeRange>("7d");
 
   const [environment, setEnvironment] = useState<Environment>("all");
 
@@ -129,7 +78,6 @@ function DashboardPage() {
   yesterday.setDate(yesterday.getDate() - 1);
 
   const [customFrom, setCustomFrom] = useState(getDateInputValue(yesterday));
-
   const [customTo, setCustomTo] = useState(today);
 
   const [appliedCustomRange, setAppliedCustomRange] = useState<{
@@ -328,19 +276,16 @@ function DashboardPage() {
 
             <div className="flex-1" />
 
-            <select
-              aria-label="Time Range"
-              value={timeRange}
-              onChange={(event) =>
-                setTimeRange(event.target.value as TimeRange)
-              }
-              className={`${inputClass} min-w-[150px]`}
-            >
-              <option value="1h">Last 1 hour</option>
-              <option value="24h">Last 24 hours</option>
-              <option value="7d">Last 7 days</option>
-              <option value="custom">Custom range</option>
-            </select>
+            <TimeRangePicker
+              timeRange={timeRange}
+              setTimeRange={setTimeRange}
+              customFrom={customFrom}
+              customTo={customTo}
+              setCustomFrom={setCustomFrom}
+              setCustomTo={setCustomTo}
+              onApply={handleApplyCustomRange}
+              isCustomRangeInvalid={isCustomRangeInvalid}
+            />
 
             <select
               aria-label="Environment"
@@ -356,41 +301,6 @@ function DashboardPage() {
               <option value="development">Development</option>
             </select>
           </div>
-
-          {/* Custom date range */}
-          {timeRange === "custom" && (
-            <div className="mt-4 flex flex-col items-start gap-4 sm:flex-row sm:items-end">
-              <label className="flex w-full flex-col gap-1.5 text-sm text-muted-foreground sm:w-auto">
-                From
-                <input
-                  type="date"
-                  value={customFrom}
-                  max={customTo || undefined}
-                  onChange={(event) => setCustomFrom(event.target.value)}
-                  className={inputClass}
-                />
-              </label>
-
-              <label className="flex w-full flex-col gap-1.5 text-sm text-muted-foreground sm:w-auto">
-                To
-                <input
-                  type="date"
-                  value={customTo}
-                  min={customFrom || undefined}
-                  onChange={(event) => setCustomTo(event.target.value)}
-                  className={inputClass}
-                />
-              </label>
-
-              <button
-                onClick={handleApplyCustomRange}
-                disabled={isCustomRangeInvalid}
-                className="h-10 rounded-lg bg-primary px-5 text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Apply
-              </button>
-            </div>
-          )}
 
           {isCustomRangeInvalid && (
             <div
@@ -629,8 +539,7 @@ function DashboardPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[750px] border-collapse text-left text-sm">
+            <DataTable minWidth="850px">
                 <thead>
                   <tr className="border-b border-border text-xs font-semibold text-muted-foreground">
                     <th className="px-3 py-3">Issue</th>
@@ -682,8 +591,7 @@ function DashboardPage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
-            </div>
+              </DataTable>
           )}
         </div>
       </div>
