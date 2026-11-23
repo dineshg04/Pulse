@@ -347,6 +347,93 @@ The frontend runs at:
 | Backend               | `npm run dev` (backend)                   |
 | Frontend              | `npm run dev` (frontend)                  |
 
+## Event Ingestion API
+
+Pulse provides a REST API that allows applications to send monitoring events to the platform.
+
+### Endpoint
+
+```http
+POST /api/ingest
+```
+
+### Authentication
+
+Every ingestion request must include the project's API key in the `X-API-Key` header.
+
+```http
+X-API-Key: YOUR_PROJECT_API_KEY
+Content-Type: application/json
+```
+
+Pulse hashes the received API key using SHA-256 and validates it against the stored project API key hash before accepting events.
+
+### Request Body
+
+The endpoint accepts an array of events, with a maximum of 500 events per request.
+
+```json
+[
+  {
+    "type": "request",
+    "timestamp": "2026-11-20T10:15:30.123Z",
+    "environment": "production",
+    "route": "/api/cart",
+    "method": "GET",
+    "statusCode": 200,
+    "durationMs": 182
+  },
+  {
+    "type": "error",
+    "timestamp": "2026-11-20T10:15:31.004Z",
+    "environment": "production",
+    "errorType": "TypeError",
+    "message": "Cannot read properties of undefined (reading 'id')",
+    "stackTrace": "TypeError: Cannot read properties of undefined (reading 'id')\n   at CartItem (cart.js:42:13)\n   at renderList (list.js:10:5)",
+    "url": "/checkout",
+    "userId": "u_1029",
+    "browser": "Chrome 131"
+  }
+]
+```
+
+### Event Processing
+
+1. Validates the project's API key.
+2. Checks that the request body is an array containing no more than 500 events.
+3. Validates each event using Zod.
+4. Stores valid events in PostgreSQL.
+5. Processes rejected events separately and collects validation errors.
+
+Invalid events do not prevent other valid events in the same batch from being accepted.
+
+### Response
+
+Successful requests return `202 Accepted`.
+
+```json
+{
+  "accepted": 1,
+  "rejected": 0,
+  "errors": []
+}
+```
+
+The response provides:
+- `accepted`: Number of successfully stored events.
+- `rejected`: Number of events rejected during validation.
+- `errors`: Validation details for rejected events, including their index, field, and error message.
+
+### Error Responses
+
+| Status Code | Description |
+|---|---|
+| `400` | Invalid request body or batch exceeds 500 events |
+| `401` | Missing or invalid API key |
+| `202` | Request accepted and event processing completed |
+
+This endpoint supports batch ingestion and partial acceptance, allowing applications to submit multiple monitoring events in a single request.
+
 ## 7. Demo Login Credentials
 
 The backend authentication test uses the following local test account:
