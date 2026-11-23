@@ -236,7 +236,7 @@ const seedEvents = async () => {
     await client.query("BEGIN");
 
     const projectResult = await client.query("SELECT id FROM projects WHERE name = $1 LIMIT 1", [
-      "Pulse Demo",
+      "Pulse Test Project",
     ]);
 
     if (!projectResult.rows.length) {

@@ -67,7 +67,7 @@ function getCustomDateRange(fromDate: string, toDate: string) {
 }
 
 function DashboardPage() {
-  const [timeRange, setTimeRange] = useState<TimeRange>("7d");
+  const [timeRange, setTimeRange] = useState<TimeRange>("24h");
 
   const [environment, setEnvironment] = useState<Environment>("all");
 

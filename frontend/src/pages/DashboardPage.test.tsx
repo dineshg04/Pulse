@@ -50,10 +50,10 @@ describe("DashboardPage", () => {
     });
   });
 
-  it("shows 7 days as the default time range", () => {
+  it("shows 24 hours as the default time range", () => {
     renderDashboardPage();
 
-    expect(screen.getByLabelText("Time Range")).toHaveValue("7d");
+    expect(screen.getByLabelText("Time Range")).toHaveValue("24h");
 
     expect(screen.queryByLabelText("From")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("To")).not.toBeInTheDocument();
@@ -63,7 +63,7 @@ describe("DashboardPage", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("hides custom date inputs when another range is selected", () => {
+  it("shows custom date inputs only when custom range is selected", () => {
     renderDashboardPage();
 
     fireEvent.change(screen.getByLabelText("Time Range"), {
@@ -75,10 +75,10 @@ describe("DashboardPage", () => {
     expect(screen.getByLabelText("To")).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("Time Range"), {
-      target: { value: "24h" },
+      target: { value: "7d" },
     });
 
-    expect(screen.getByLabelText("Time Range")).toHaveValue("24h");
+    expect(screen.getByLabelText("Time Range")).toHaveValue("7d");
     expect(screen.queryByLabelText("From")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("To")).not.toBeInTheDocument();
   });

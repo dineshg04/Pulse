@@ -55,7 +55,7 @@ const seed = async () => {
       ]);
     } else {
       await client.query("INSERT INTO projects (name, api_key_hash) VALUES ($1, $2)", [
-        "Pulse Demo",
+        "Pulse Test Project",
         apiKeyHash,
       ]);
     }
