@@ -1,4 +1,4 @@
-# Pulse – Application Error Monitoring & Analytics Platform
+# Pulse – Error Monitoring & Analytics Platform
 
 ## 1. Overview
 
@@ -118,11 +118,9 @@ The migration creates **five tables and seven indexes**.
 | Issues           | Stores grouped errors and their tracking information.        |
 | Supporting table | Stores additional data defined by the initial migration.     |
 
-The exact table names, columns, constraints, and relationships are defined in the SQL migration file.
-
 ### Indexing Strategy
 
-The migration creates seven indexes to improve database query performance.
+The migration creates indexes to improve database query performance.
 
 Indexes support frequently accessed monitoring data, such as:
 
@@ -132,8 +130,6 @@ Indexes support frequently accessed monitoring data, such as:
 - Supporting commonly used dashboard and issue queries.
 
 Indexes improve read performance, but they also require additional storage and add overhead when records are inserted or updated.
-
-**Note:** The migration file is the source of truth for the exact index names and indexed columns.
 
 ## 6. Important Technical Decisions and Trade-offs
 
@@ -146,7 +142,6 @@ Indexes improve read performance, but they also require additional storage and a
 | JWT authentication    | Supports stateless authentication for protected APIs.               | Token expiration and secure storage must be handled carefully.         |
 | API key hashing       | Avoids storing project API keys as plain text.                      | Requires securely managing the original key during provisioning.       |
 | TanStack Query        | Handles API data fetching, caching, and loading/error states.       | Requires managing query keys and cache invalidation.                   |
-| Docker Compose        | Starts the frontend, backend, and database together.                | The current configuration is intended for development, not production. |
 
 ## 7. Getting Started with Docker
 
@@ -352,8 +347,6 @@ The frontend runs at:
 | Backend               | `npm run dev` (backend)                   |
 | Frontend              | `npm run dev` (frontend)                  |
 
-**Note:** Run the database migration only when creating a fresh database. The event seed script is optional and recreates the demo project's sample events and issues.
-
 ## 7. Demo Login Credentials
 
 The backend authentication test uses the following local test account:
@@ -365,8 +358,6 @@ The backend authentication test uses the following local test account:
 The seed script also creates a Viewer account using `SEED_VIEWER_EMAIL` and `SEED_VIEWER_PASSWORD` from the root `.env` file.
 
 For a fresh local setup, use the credentials configured in your environment file. The test account above is valid only when the corresponding user exists in the database with the matching password.
-
-**Security:** These are development-only credentials. Change them before using any production environment.
 
 ## 8. Database Initialization and Seeding
 
